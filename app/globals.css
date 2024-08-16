@@ -67,3 +67,10 @@
     @apply bg-background text-foreground;
   }
 }
+
+.icon {
+  color: var(--primary-color);
+  fill: currentColor;
+  width: 64px;
+  height: 64px;
+}
