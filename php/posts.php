@@ -98,8 +98,6 @@ class Posts {
 }
 
 
-
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $operation = $_POST['operation'];
   $json = isset($_POST['json']) ? $_POST['json'] : null;
@@ -110,7 +108,6 @@ else if ($_SERVER['REQUEST_METHOD'] == 'GET') {
   $json = isset($_GET['json']) ? $_GET['json'] : null;
   $json = json_decode($json, true);
 }
-
 
 $post = new Posts();
 switch ($operation) {

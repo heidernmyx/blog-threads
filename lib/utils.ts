@@ -33,3 +33,11 @@ export interface CommentDetails {
   comment_text: string,
   comment_username: string
 }
+
+export type RegisterFormFields = {
+  username: string,
+  password: string,
+  fname: string,
+  lname: string,
+  email: string
+}
