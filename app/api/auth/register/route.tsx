@@ -5,13 +5,15 @@ import { NextResponse } from "next/server"
 import { RegisterFormFields } from "@/lib/utils"
 import axios from "axios"
 
-export const _register = async (data: RegisterFormFields) => {
+export const signup = async (data: RegisterFormFields) => {
 
   const bcrypt = require('bcrypt');
   const saltRounds = 10; // You can adjust the salt rounds for stronger security
   const hashedPassword = await bcrypt.hash(data.password, saltRounds);
 
   data.password = hashedPassword;
+
+  console.log(data)
   const formData = new FormData();
   formData.append('operation', 'addAccount');
   formData.append('json', JSON.stringify(data));

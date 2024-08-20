@@ -23,12 +23,12 @@ import Link from 'next/link'
 import { useForm } from 'react-hook-form' 
 import { RegisterFormFields, ResultProps } from '@/lib/utils'
 import { RegisterSchema } from '@/lib/schema'
-import { _register } from '@/app/api/register'
+import { signup } from '@/app/api/auth/register/route'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Router } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
-const Register = () => {
+const RegisterForm = () => {
 
   const router = useRouter();
   
@@ -37,7 +37,7 @@ const Register = () => {
   });
 
   const registerUser = async ( data: RegisterFormFields ) => {
-    const response = await _register(data);
+    const response = await signup(data);
     const { message, error } = response as ResultProps;
     alert(message || error)
 
@@ -53,7 +53,7 @@ const Register = () => {
         <Card className="w-full max-w-sm ">
           <form onSubmit={handleSubmit(registerUser)}>
             <CardHeader>
-              <CardTitle className="text-2xl">Register</CardTitle>
+              <CardTitle className="text-2xl">Sign up</CardTitle>
               <CardDescription>
                 Enter your details below to create an account.
               </CardDescription>
@@ -131,4 +131,4 @@ const Register = () => {
   )
 }
 
-export default Register
+export default RegisterForm

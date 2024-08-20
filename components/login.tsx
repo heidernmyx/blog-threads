@@ -24,25 +24,55 @@ const Login = () => {
   const router = useRouter();
 
   
-  const submitData = async (data: LoginFormFields) => {
-    const response = await signIn('credentials', {
-      redirect: false,
-      username: data.username,
-      password: data.password,
-    });
-  
-    console.log(response);
-  
-    if (response?.error) {
-      // Handle the error without redirecting
-      console.error('Login failed:', response.error);
-      alert('Login failed: ' + response.error);
-    } else if (response?.ok) {
-      // Handle successful login
-      console.log('Login successful');
-      // Redirect to a different page after a successful login
-      // You can use router.push('/dashboard') or similar
+  const credentialLogin = async (data: LoginFormFields) => {
+    try {
+      const response = await signIn('credentials', {
+        username: data.username,
+        password: data.password,
+        redirect: false
+      })
+
+      console.log(response)
+
+
+    //   {
+    //     error: null,
+    //     status: 200,
+    //     ok: true,
+    //     url: 'http://localhost:3000/auth/signin'
+    //   }
+    // 17:26:48.844 | +54 sec | next.js browser	  
+    //   {
+    //     error: 
+    //       'Cannot destructure property \'account_id\' of \'response.data\' as it is null.',
+    //     status: 401,
+    //     ok: false,
+    //     url: null
+    //   }
+
+    if(response?.ok) {
+      window.location.reload();
     }
+    else if(!response?.ok) {
+      alert("Wrong Credentials")
+    }
+
+      // if (response?.error) {
+      //   alert('Wrong Credentials')
+      // }
+      // if (response?.error) {
+      //   alert('Wrong Credentials')
+      // }
+
+
+      // if () {
+
+      // }
+    } catch (error) {
+      console.error(error)
+    }
+  
+    
   }
   
   
@@ -50,7 +80,7 @@ const Login = () => {
   return (
     <>
       <Card className="w-full max-w-sm ">
-        <form onSubmit={handleSubmit(submitData)}>
+        <form onSubmit={handleSubmit(credentialLogin)}>
           <CardHeader>
             <CardTitle className="text-2xl">Login</CardTitle>
             <CardDescription>
@@ -68,7 +98,7 @@ const Login = () => {
             </div>
           </CardContent>
           <CardFooter className='flex flex-col space-y-4'>
-            <Button className="w-full">Sign in</Button>
+            <Button className="w-full" disabled={isSubmitting}>Sign in</Button>
             <span>Dont have an account yet? Register <Link className='underline' href={'/auth/register'}>here!</Link></span>
           </CardFooter>
         </form>

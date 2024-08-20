@@ -1,54 +1,78 @@
 import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
+import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
+import {comparePassword} from '@/actions/hashpw';
+import { string } from "zod";
+import { NextResponse } from "next/server";
 
 // Your own logic for dealing with plaintext password strings; be careful!
 // import { saltAndHashPassword } from "@/utils/password";
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+const handler = NextAuth({
+  session: {
+    strategy: 'jwt',
+  },
+  jwt: {
+    secret: process.env.NEXTAUTH_SECRET,
+    maxAge: 60 * 60 // 1 hour
+  },
   providers: [
-    Credentials({
-      // You can specify which fields should be submitted, by adding keys to the `credentials` object.
-      // e.g. domain, username, password, 2FA token, etc.
+    CredentialsProvider({
       credentials: {
-        email: { label: "Email", type: "text", placeholder: "jsmith@example.com" },
-        password: { label: "Password", type: "password" },
+        username:  { label: "Username", type: "text" },
+        password: {  label: "Password", type: "password" }
       },
-      authorize: async (credentials) => {
-        try {
-          const formData = new FormData();
-          const email = credentials?.email;
-          const password = credentials?.password;
-      
-          const data = { email, password };
-          formData.append('json', JSON.stringify(data));
-      
-          const response = await axios.post(`${process.env.NEXT_PUBLIC_URL}php/login.php`, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          });
-      
-          if (response.data.success) {
-            // If login is successful, return the user object
-            return { id: response.data.id, name: response.data.name, email: response.data.email };
-          } else {
-            // Return null instead of throwing an error
-            return null;
-          }
-        } catch (error) {
-          console.error("Login error:", error);
-          return null; // Return null on any error
+      async authorize(credentials, req) {
+
+        const formData = new FormData();
+
+        const username = credentials?.username;
+        const password = credentials?.password;
+        const data = { username, password };
+
+        formData.append('json', JSON.stringify(data));
+        const url = `${process.env.NEXT_PUBLIC_URL}php/login.php`;
+        const response = await axios({
+          url: url,
+          method: 'POST',
+          data: formData
+        })
+
+        console.log(response.data);
+        const { account_id, uname, email } = response.data;
+        const condition = await comparePassword(password!, response.data.password);
+        console.log(condition)
+        if (condition) {
+
+          const user = { id: account_id, username: uname, email: email } 
+          return user;
+        }
+        else {
+          // return NextResponse.json;
+          return null;
         }
       }
-      
-    }),
+    })
   ],
   pages: {
     signIn: '/auth/signin',
     signOut: '/auth/signout',
-    error: '/auth/error', // Error code passed in query string as ?error=
+    // error: '/auth/error', // Error code passed in query string as ?error=
     verifyRequest: '/auth/verify-request', // (used for check email message)
     // newUser: null // If set, new users will be directed here on first sign in
   }
 });
+
+export { handler as GET, handler as POST} ;
+
+
+
+
+
+
+
+
+
+
+
+

@@ -21,6 +21,7 @@
     "bcrypt": "^5.1.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "kill-port": "^2.0.1",
     "lucide-react": "^0.427.0",
     "next": "14.2.5",
     "next-auth": "^4.24.7",
