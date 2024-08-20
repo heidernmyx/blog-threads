@@ -9,3 +9,9 @@ export const RegisterSchema = z.object({
   birthdate: z.string(),
   gender: z.string()
 })
+
+
+export const LoginSchema = z.object({
+  username: z.string(),
+  password: z.string()
+})

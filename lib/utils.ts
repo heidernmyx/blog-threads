@@ -2,7 +2,7 @@ import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
 import z from 'zod';
-import { RegisterSchema } from "./schema";
+import { RegisterSchema, LoginSchema } from "./schema";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -37,6 +37,8 @@ export interface CommentDetails {
 
 
 export type RegisterFormFields = z.infer<typeof RegisterSchema>
+
+export type LoginFormFields = z.infer<typeof LoginSchema>
 
 export type ResultProps = {
   message?: string;

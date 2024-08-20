@@ -6,8 +6,12 @@ import { RegisterFormFields } from "@/lib/utils"
 import axios from "axios"
 
 export const _register = async (data: RegisterFormFields) => {
-  console.log(data)
 
+  const bcrypt = require('bcrypt');
+  const saltRounds = 10; // You can adjust the salt rounds for stronger security
+  const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+
+  data.password = hashedPassword;
   const formData = new FormData();
   formData.append('operation', 'addAccount');
   formData.append('json', JSON.stringify(data));

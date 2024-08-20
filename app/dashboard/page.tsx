@@ -55,7 +55,6 @@ const Dashboard = () => {
       window.location.reload();
     }
   };
-
   
   return (
     <>

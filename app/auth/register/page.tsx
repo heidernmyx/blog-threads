@@ -23,11 +23,14 @@ import Link from 'next/link'
 import { useForm } from 'react-hook-form' 
 import { RegisterFormFields, ResultProps } from '@/lib/utils'
 import { RegisterSchema } from '@/lib/schema'
-// import axios from 'axios';
-import { _register } from '@/actions/register'
+import { _register } from '@/app/api/register'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Router } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 const Register = () => {
+
+  const router = useRouter();
   
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting }} = useForm<RegisterFormFields>({
     resolver: zodResolver(RegisterSchema)
@@ -35,9 +38,12 @@ const Register = () => {
 
   const registerUser = async ( data: RegisterFormFields ) => {
     const response = await _register(data);
-    // console.log(response) 
     const { message, error } = response as ResultProps;
     alert(message || error)
+
+    if (message) {
+      router.push('/auth/signin')
+    }
 
   }
 

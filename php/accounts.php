@@ -41,6 +41,9 @@ class Accounts {
     $stmt->execute();
     $result = $stmt->rowCount() > 0 ? 1 :0;
 
+    unset($conn);
+    unset($stmt);
+
     if ($result == 1) {
       echo json_encode(['message' => 'Account successfully added']);
     }
@@ -84,6 +87,10 @@ function usernameCheck () {
   $stmt->execute();
   $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
   if (!empty($result)) {
+
+
+    unset($conn);
+    unset($stmt);
     return true;
   }
 }
