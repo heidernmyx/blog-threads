@@ -39,9 +39,8 @@ const handler = NextAuth({
         })
 
         console.log(response.data);
-        const { account_id, uname, email } = response.data;
+        const { account_id, username: uname, email } = response.data;
         const condition = await comparePassword(password!, response.data.password);
-        console.log(condition)
         if (condition) {
 
           const user = { id: account_id, username: uname, email: email } 
@@ -54,6 +53,29 @@ const handler = NextAuth({
       }
     })
   ],
+  callbacks: {
+    async jwt({ token, user }) {
+      // Add user information to the token
+      console.log(token);
+      console.log(user);
+      if (user) {
+        token.id = user.id;
+        token.username = user.username;
+        token.email = user.email;
+      } else {
+        console.log(false);
+      }
+    
+      return token;
+    },
+    async session({ session, token }) {
+      // Add token information to the session
+      session.user.id = token.id;
+      session.user.username = token.username;
+      session.user.email = token.email ?? "";
+      return session;
+    },
+  },
   pages: {
     signIn: '/auth/signin',
     signOut: '/auth/signout',

@@ -99,7 +99,7 @@ const Login = () => {
           </CardContent>
           <CardFooter className='flex flex-col space-y-4'>
             <Button className="w-full" disabled={isSubmitting}>Sign in</Button>
-            <span>Dont have an account yet? Register <Link className='underline' href={'/auth/register'}>here!</Link></span>
+            <span>Dont have an account yet? Register <Link className='underline' href={'/auth/signup'}>here!</Link></span>
           </CardFooter>
         </form>
       </Card>

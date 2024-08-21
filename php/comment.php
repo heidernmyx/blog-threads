@@ -25,20 +25,20 @@ class Comment {
       // die;
   
 
-$sql = "INSERT INTO `tbl_comments` (
+      $sql = "INSERT INTO `tbl_comments` (
           `postComment_id`,
-          `comment_text`,
-          `comment_username`
+          `userComment_id`,
+          `comment_text`
       )
       VALUES (
           :post_id,
-          :comment_text,
-          :comment_username
+          :userComment_id,
+          :comment_text
       )";
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(':post_id', $json['post_id'], PDO::PARAM_INT);
+      $stmt->bindParam(':userComment_id', $json['userComment_id'], PDO::PARAM_STR);
       $stmt->bindParam(':comment_text', $json['comment_text'], PDO::PARAM_STR);
-      $stmt->bindParam(':comment_username', $json['comment_username'], PDO::PARAM_STR);
       
       $stmt->execute();
       

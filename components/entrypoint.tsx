@@ -15,7 +15,6 @@ const EntryPoint = () => {
     const timer = setTimeout(() => setProgress(66), 500)
     clearTimeout(timer)
     if (session) {
-      console.log(session)
       router.push('/dashboard')
     }
     else {
@@ -31,7 +30,6 @@ const EntryPoint = () => {
         Loading...
         <Progress value={progress} />
       </div>
-
     </div>
   )
 }

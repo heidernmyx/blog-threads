@@ -3,6 +3,7 @@ import { Inter as FontSans } from "next/font/google";
 import { ReactNode } from "react";
 import { ThemeProvider } from "next-themes";
 import { ModeToggle } from "@/components/ui/mode-toggle";
+import ProfileDropDown from "@/components/profile-drop-down";
 
 // Ensure you have a utility function `cn` like this or correctly imported.
 function cn(...classes: string[]) {
@@ -28,7 +29,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
           fontSans.variable
         )}
       >
-
         <ThemeProvider
             attribute="class"
             defaultTheme="system"

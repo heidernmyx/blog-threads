@@ -24,14 +24,27 @@ class Posts {
     // SQL query to get posts along with their comments
     $sql = "
         SELECT 
-            p.post_id, p.post_title, p.post_username, p.post_description, p.time_posted,
-            c.comment_id, c.comment_text, c.comment_username, c.comment_time
+            p.post_id, 
+            p.post_title, 
+            a.username AS post_username, 
+            p.post_description, 
+            p.time_posted,
+            c.comment_id, 
+            c.comment_text, 
+            ca.username AS comment_username,
+            c.comment_time
         FROM 
             tbl_posts p
         LEFT JOIN 
             tbl_comments c ON p.post_id = c.postComment_id
+        INNER JOIN 
+            tbl_accounts a ON p.postUser_id = a.account_id
+        LEFT JOIN 
+            tbl_accounts ca ON c.userComment_id = ca.account_id
         ORDER BY 
-            p.time_posted DESC, c.comment_time ASC
+            p.time_posted DESC, 
+            c.comment_time ASC;
+
     ";
 
     $stmt = $conn->prepare($sql);
@@ -75,17 +88,17 @@ class Posts {
 
     $sql = "INSERT INTO `tbl_posts` (
         `post_title`,
-        `post_username`,
+        `postUser_id`,
         `post_description`
     )
     VALUES (
         :title,
-        :username,
+        :user_id,
         :content
     )";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':title', $json['post_title']);
-    $stmt->bindParam(':username', $json['post_username']);
+    $stmt->bindParam(':user_id', $json['postUser_id']);
     $stmt->bindParam(':content', $json['post_description']);
     $stmt->execute();
 

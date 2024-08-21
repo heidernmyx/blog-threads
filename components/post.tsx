@@ -5,8 +5,22 @@ import { Input } from "@/components/ui/input";
 import { cn, PostProps, CommentProps, CommentDetails } from "@/lib/utils";
 import Image from 'next/image';
 import axios from 'axios';
+import { returnSession } from '../app/api/auth/getsession/route';
+import type { User } from 'next-auth';
+import Vote from './vote';
 
 const Post = () => {
+
+  const [ session, setSession ] = React.useState<User>();
+  useEffect(() => {
+    const fetchSession = async () => {
+      const sessionData = await returnSession();
+      console.log(sessionData)
+      setSession(sessionData);
+    }
+    fetchSession();
+    console.log(session)
+  }, [])
   const [posts, setPosts] = useState<PostProps[]>([]);
   const [activeCommentPostId, setActiveCommentPostId] = useState<number | null>(null);
   const [ comment, setComment ] = useState<string>('');
@@ -15,6 +29,7 @@ const Post = () => {
       const response = await axios.get<PostProps[]>(`${process.env.NEXT_PUBLIC_URL}php/posts.php`, {
         params: { operation: 'fetch' }
       });
+      console.log(response.data)
       if (response.status === 200 && response.data) {
         const List: PostProps[] = Array.isArray(response.data)
           ? response.data.map((post: PostProps) => ({
@@ -33,6 +48,7 @@ const Post = () => {
               : [],
             }))
           : [];
+          console.log(posts)
         setPosts(List);
       }
     };
@@ -51,13 +67,13 @@ const Post = () => {
 
   const commentOnPost = async (post_id: number, comment_text: string) => {
     // alert('commenting on post');
-    let person = prompt("Please enter your name", "Anonymous");
+    // let person = prompt("Please enter your name", "Anonymous");
     console.log(post_id, comment_text)
     const formData = new FormData();
     const commentDetails: CommentDetails = {
       post_id: post_id,
       comment_text: comment_text,
-      comment_username: person || 'Anonymous',
+      userComment_id: session!.id,
     }
     formData.append('operation', 'comment');
     formData.append('json', JSON.stringify(commentDetails));
@@ -89,15 +105,7 @@ const Post = () => {
               <p>{post.post_description}</p>
             </CardContent>
             <CardFooter className="border-t border-border p-4 flex justify-between items-center text-muted-foreground">
-              <div className="w-full flex items-center">
-                <Button variant="secondary" className='hover:text-primary-foreground'>
-                  ▲ <span className='text-xs'>Upvote</span>
-                </Button>
-                <Button variant="secondary" className='hover:text-primary-foreground'>
-                  ▼ <span className='text-xs'>Downvote</span>
-                </Button>
-                <p className="text-sm text-muted-foreground">123</p> {/* Replace 123 with actual vote count if available */}
-              </div>
+              <Vote post_id={post.post_id} user_id={session?.id} />
               <div className="flex items-center space-x-2">
                 {/* Comment button */}
                 <Button onClick={() => handleCommentClick(post.post_id)} variant="secondary" className="text-xs text-primary hover:text-primary-foreground">
