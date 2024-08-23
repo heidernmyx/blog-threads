@@ -108,6 +108,50 @@ class Posts {
     return json_encode($result); // Use json_encode to convert the result to JSON
   }
 
+  function getLikes($json) {
+    include 'connection/connection.php';
+      
+    $sql = "SELECT
+        `vote_id`,
+        `vote_type`
+    FROM
+        `tbl_votes`
+    WHERE post_id = :post_id AND vote_type = 'upvote'";
+
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':post_id', $json['post_id'], PDO::PARAM_INT);
+
+    $stmt->execute();
+    $resultUpvote = $stmt->rowCount();
+    unset($conn);
+    unset($stmt);
+
+
+    include 'connection/connection.php';
+    $sql = "SELECT
+        `vote_id`,
+        `vote_type`
+    FROM
+        `tbl_votes`
+    WHERE post_id = :post_id AND vote_type = 'downvote'";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':post_id', $json['post_id'], PDO::PARAM_INT);
+
+    $stmt->execute();
+    $resultDownvote = $stmt->rowCount();
+    unset($conn);
+    unset($stmt);
+
+    echo json_encode([
+      'upvote' => $resultUpvote,
+      'downvote' => $resultDownvote,
+    ]);
+
+    unset($conn);
+    unset($stmt);
+  }
+
 }
 
 
@@ -129,6 +173,9 @@ switch ($operation) {
     break;
   case 'upload':
     $post->upload($json);
+    break;
+  case 'fetchLikes':
+    $post->getLikes($json);
     break;
   default:
     echo 'Invalid Operation';

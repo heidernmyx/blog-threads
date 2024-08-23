@@ -103,6 +103,30 @@ class Vote {
         echo json_encode(['status' => 'success', 'message' => 'Downvoted successfully']);
     }
   }
+
+  function fetchPostVoteList($json) {
+    
+    include './connection/connection.php';
+
+    $sql = "SELECT
+        tbl_accounts.username,
+        `vote_type`
+    FROM
+        `tbl_votes`
+    INNER JOIN tbl_accounts ON tbl_accounts.account_id = tbl_votes.user_id
+    WHERE post_id = :post_id";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':post_id', $json['post_id'], PDO::PARAM_INT);
+    $stmt->execute();
+
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    unset($conn);
+    unset($stmt);
+
+    echo json_encode($result);
+  }
+
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -123,6 +147,9 @@ switch ($operation) {
     break;
   case 'downvote':
     $vote->downVotePosts($json);
+    break;
+  case 'fetchPostVoteList':
+    $vote->fetchPostVoteList($json);
     break;
   default:
     echo json_encode(['status' => 'error', 'message' => 'Invalid operation']);

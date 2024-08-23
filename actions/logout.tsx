@@ -1,9 +1,11 @@
 "use server"
 
 import { LoginFormFields } from "@/lib/utils"
-import axios from 'axios';
+import { signOut } from "next-auth/react";
+import { NextRequest, NextResponse } from "next/server";
 
-export const Logout = async () => {
-  const formData = new FormData();
-  formData.append('operation', 'logout');
+export const Logout = async (req: NextRequest) => {
+  await signOut({ callbackUrl: "/" });
+  alert('Logout Successful');
+  // return NextResponse.redirect(new URL('/', req.nextUrl));
 }

@@ -19,8 +19,9 @@ const Post = () => {
       setSession(sessionData);
     }
     fetchSession();
-    console.log(session)
+    // console.log(session)
   }, [])
+  // console.log(session);
   const [posts, setPosts] = useState<PostProps[]>([]);
   const [activeCommentPostId, setActiveCommentPostId] = useState<number | null>(null);
   const [ comment, setComment ] = useState<string>('');
@@ -29,7 +30,7 @@ const Post = () => {
       const response = await axios.get<PostProps[]>(`${process.env.NEXT_PUBLIC_URL}php/posts.php`, {
         params: { operation: 'fetch' }
       });
-      console.log(response.data)
+      // console.log(response.data)
       if (response.status === 200 && response.data) {
         const List: PostProps[] = Array.isArray(response.data)
           ? response.data.map((post: PostProps) => ({

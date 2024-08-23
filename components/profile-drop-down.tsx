@@ -13,6 +13,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { returnSession } from '../app/api/auth/getsession/route';
 import type { User } from 'next-auth';
+import { Logout } from '@/actions/logout';
+import { signOut } from "next-auth/react";
 
 const ProfileDropDown = () => {
 
@@ -21,11 +23,14 @@ const ProfileDropDown = () => {
   React.useEffect(() => {
     const fetchSession = async () => {
       const sessionData = await returnSession();
+      const user = sessionData;
       setSession(sessionData)
+      console.log(user);
       console.log(sessionData)
     }
     fetchSession();
   }, [])
+
 
   return (
     <>
@@ -48,7 +53,7 @@ const ProfileDropDown = () => {
           <DropdownMenuItem>Settings</DropdownMenuItem>
           <DropdownMenuItem>Support</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Logout</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>Logout</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </>
