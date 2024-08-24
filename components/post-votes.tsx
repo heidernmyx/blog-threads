@@ -25,7 +25,7 @@ const PostVotes: React.FC<PostVotesProps> = ({ post_id, onClick }) => {
       setVotes(upvote - downvote);
     }
     fetchLikes();
-  }, [])
+  }, )
   return (
     <>
       <Button onClick={onClick} variant={'link'}>

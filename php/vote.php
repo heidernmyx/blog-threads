@@ -8,6 +8,9 @@ class Vote {
   function getUserVote($json) {
     include 'connection/connection.php';
 
+    $post_id = $json['post_id'];
+    $user_id = $json['user_id'];
+
     $query = $conn->prepare("SELECT vote_type FROM tbl_votes WHERE post_id = :post_id AND user_id = :user_id");
     $query->bindParam(':post_id', $post_id, PDO::PARAM_INT);
     $query->bindParam(':user_id', $user_id, PDO::PARAM_INT);
@@ -109,6 +112,7 @@ class Vote {
     include './connection/connection.php';
 
     $sql = "SELECT
+        `vote_id`,
         tbl_accounts.username,
         `vote_type`
     FROM

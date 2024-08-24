@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
-import {comparePassword} from '@/actions/hashpw';
+import { comparePassword } from '@/actions/hashpw';
 import { string } from "zod";
 import { NextResponse } from "next/server";
 
@@ -19,8 +19,8 @@ const handler = NextAuth({
   providers: [
     CredentialsProvider({
       credentials: {
-        username:  { label: "Username", type: "text" },
-        password: {  label: "Password", type: "password" }
+        username: { label: "Username", type: "text" },
+        password: { label: "Password", type: "password" }
       },
       async authorize(credentials, req) {
 
@@ -43,7 +43,7 @@ const handler = NextAuth({
         const condition = await comparePassword(password!, response.data.password);
         if (condition) {
 
-          const user = { id: account_id, username: uname, email: email } 
+          const user = { id: account_id, username: uname, email: email }
           return user;
         }
         else {
@@ -63,9 +63,9 @@ const handler = NextAuth({
         token.username = user.username;
         token.email = user.email;
       } else {
-        console.log(false);
+        // console.log(false);
       }
-    
+
       return token;
     },
     async session({ session, token }) {
@@ -85,7 +85,7 @@ const handler = NextAuth({
   }
 });
 
-export { handler as GET, handler as POST} ;
+export { handler as GET, handler as POST };
 
 
 

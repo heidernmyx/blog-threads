@@ -8,10 +8,22 @@ import axios from 'axios';
 import { returnSession } from '../app/api/auth/getsession/route';
 import type { User } from 'next-auth';
 import Vote from './vote';
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarSeparator,
+  MenubarShortcut,
+  MenubarTrigger,
+} from "@/components/ui/menubar"
+import { usePathname } from 'next/navigation';
 
 const Post = () => {
 
   const [ session, setSession ] = React.useState<User>();
+  const pathname = usePathname();
+  console.log(pathname);
   useEffect(() => {
     const fetchSession = async () => {
       const sessionData = await returnSession();
@@ -19,9 +31,8 @@ const Post = () => {
       setSession(sessionData);
     }
     fetchSession();
-    // console.log(session)
   }, [])
-  // console.log(session);
+  console.log(session);
   const [posts, setPosts] = useState<PostProps[]>([]);
   const [activeCommentPostId, setActiveCommentPostId] = useState<number | null>(null);
   const [ comment, setComment ] = useState<string>('');
@@ -49,7 +60,7 @@ const Post = () => {
               : [],
             }))
           : [];
-          console.log(posts)
+        console.log(posts)
         setPosts(List);
       }
     };
@@ -57,10 +68,34 @@ const Post = () => {
     fetchPosts();
   }, []);
 
-  const formatTimePosted = (time_posted: string) => {
-    const date = new Date(time_posted);
-    return date.toLocaleString();
+  React.useEffect(() => {
+    if (pathname == '/dashboard/liked-posts') {
+      
+    }
+  }, [pathname])
+
+  
+
+  const formatTimePosted = (time_posted: string): string => {
+    const postDate = new Date(time_posted);
+    const now = new Date();
+  
+    const secondsAgo = Math.floor((now.getTime() - postDate.getTime()) / 1000);
+    
+    if (secondsAgo < 60) {
+      return `${secondsAgo} seconds ago`;
+    } else if (secondsAgo < 3600) {
+      const minutesAgo = Math.floor(secondsAgo / 60);
+      return `${minutesAgo} minute${minutesAgo > 1 ? 's' : ''} ago`;
+    } else if (secondsAgo < 86400) {
+      const hoursAgo = Math.floor(secondsAgo / 3600);
+      return `${hoursAgo} hour${hoursAgo > 1 ? 's' : ''} ago`;
+    } else {
+      const daysAgo = Math.floor(secondsAgo / 86400);
+      return `${daysAgo} day${daysAgo > 1 ? 's' : ''} ago`;
+    }
   };
+  
 
   const handleCommentClick = (post_id: number) => {
     setActiveCommentPostId(prevId => (prevId === post_id ? null : post_id));
@@ -85,6 +120,42 @@ const Post = () => {
     });
     console.log(response.status);
     console.log(response.data);
+    const now = new Date();
+    console.log(now)
+    if (response.data == 1) {
+      const newComment: CommentProps = {
+        comment_id: commentDetails.post_id,
+        comment_text: commentDetails.comment_text,
+        comment_username: session!.username,
+        comment_time: formatTimePosted(new Date().toString())
+      }
+      setPosts(prevPosts =>
+      prevPosts.map(post =>
+        post.post_id === post_id
+          ? {
+              ...post,
+              post_comments: [...post.post_comments, newComment],
+            }
+          : post
+      )
+    );
+    setComment('');
+    };
+     // Clear the comment input
+  }
+
+  const deletePost = async (post_id: number) => {
+    console.log(post_id)
+    const url = `${process.env.NEXT_PUBLIC_URL}php/posts.php`;
+    const formData = new FormData();
+    formData.append('operation', 'delete');
+    formData.append('json', JSON.stringify({post_id: post_id}))
+    const response = await axios({
+      url: url,
+      method: 'POST',
+      data: formData
+    })
+    
   }
   
   return (
@@ -93,20 +164,48 @@ const Post = () => {
         posts.map((post) => (
           <Card
             key={post.post_id}
-            className={cn("w-[36vw] mb-5 border border-border shadow-lg rounded-lg bg-secondary")}
+            className={cn("relative w-[36vw] mb-5 border border-border shadow-lg rounded-lg bg-secondary")}
           >
+            {/* Menubar positioned at the top-right of the entire Card */}
+            { post.post_username == session?.username && 
+              <div className="absolute top-4 right-4">
+                <Menubar className="bg-inherit">
+                  <MenubarMenu>
+                    <MenubarTrigger className="hover:bg-background rounded-full">...</MenubarTrigger>
+                    <MenubarContent>
+                      <MenubarItem >
+                        Edit<MenubarShortcut>⌘T</MenubarShortcut>
+                      </MenubarItem>
+                      <MenubarItem onClick={() => deletePost(post.post_id)}>
+                        Delete<MenubarShortcut>⌘D</MenubarShortcut>
+                      </MenubarItem>
+                    </MenubarContent>
+                  </MenubarMenu>
+                </Menubar>
+              </div>
+            }
+
+            {/* Card Header */}
             <CardHeader className="border-b border-border p-4">
-              <CardTitle className="text-center text-xl font-semibold text-primary">{post.post_title}</CardTitle>
               <CardDescription className="text-sm text-muted-foreground">
-                Posted by <span className='text-lg font-medium text-primary'>{post.post_username}</span>
-                <p className="mt-[0.5vh] text-xs text-muted-foreground">Posted on: {formatTimePosted(post.time_posted)}</p>
+                Posted by <span className="text-lg font-medium text-primary">{post.post_username}</span>
+                <p className="mt-[0.5vh] text-xs text-muted-foreground">Posted: {formatTimePosted(post.time_posted)}</p>
+              <CardTitle className="text-center text-xl font-semibold text-primary">{post.post_title}</CardTitle>
+
               </CardDescription>
             </CardHeader>
+
+            {/* Card Content */}
             <CardContent className="p-4 text-foreground">
               <p>{post.post_description}</p>
             </CardContent>
+
+            {/* Card Footer */}
             <CardFooter className="border-t border-border p-4 flex justify-between items-center text-muted-foreground">
-              <Vote post_id={post.post_id} user_id={session?.id} />
+              <Vote 
+                post_id={post.post_id} 
+                user_id={session?.id} 
+              />
               <div className="flex items-center space-x-2">
                 {/* Comment button */}
                 <Button onClick={() => handleCommentClick(post.post_id)} variant="secondary" className="text-xs text-primary hover:text-primary-foreground">
@@ -114,30 +213,29 @@ const Post = () => {
                 </Button>
               </div>
             </CardFooter>
+
+            {/* Comments Section */}
             {activeCommentPostId === post.post_id && (
               <>
-                <hr className='mx-[1vw] h-[2px] bg-white'/>
+                <hr className="mx-[1vw] h-[2px] bg-white"/>
                 <div className="mx-[1vw] my-[1vh] bg-opacity-20">
                   {post.post_comments.map(comment => (
                     <div key={comment.comment_id} className="border-b border-border p-2">
                       <p className="text-sm text-muted-foreground">{comment.comment_text}</p>
-                      <p className="text-xs text-muted-foreground">— {comment.comment_username} at {formatTimePosted(comment.comment_time)}</p>
+                      <p className="text-xs text-muted-foreground">— <span className='text-base'>{comment.comment_username} </span>at {formatTimePosted(comment.comment_time)}</p>
                     </div>
                   ))}
-                  {/* <div  className="border-b border-border p-2">
-                    <p className="text-sm text-muted-foreground">Eyyy!</p>
-                    <p className="text-xs text-muted-foreground">— Anonymouses at 12/2/2 10:30:2</p>
-                  </div> */}
                 </div>
-                <div className='flex mx-[1vw] my-[1vh] space-x-2'>
-                  <Input onChange={(e) => setComment(e.target.value)} className="rounded px-[1vw] py-[1vh] outline-none focus-visible:outline-none" placeholder='Comment'/>
-                  <Button onClick={() => commentOnPost(post.post_id, comment)} variant={'outline'} size={'icon'}>
-                    <Image alt='comment' className="dark:invert" src='/assets/svg/send-arrow-direction-svgrepo-com.svg' width={20} height={20}/>
+                <div className="flex mx-[1vw] my-[1vh] space-x-2">
+                  <Input onChange={(e) => setComment(e.target.value)} className="rounded px-[1vw] py-[1vh] outline-none focus-visible:outline-none" placeholder="Comment"/>
+                  <Button onClick={() => commentOnPost(post.post_id, comment)} variant="outline" size="icon">
+                    <Image alt="comment" className="dark:invert" src="/assets/svg/send-arrow-direction-svgrepo-com.svg" width={20} height={20}/>
                   </Button>
                 </div>
               </>
             )}
           </Card>
+
         ))
       ) : (
         <p className="text-muted-foreground">No posts available.</p>

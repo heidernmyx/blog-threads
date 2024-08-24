@@ -108,6 +108,21 @@ class Posts {
     return json_encode($result); // Use json_encode to convert the result to JSON
   }
 
+  function deletePost($json) {
+    include '../php/connection/connection.php';
+
+    $sql = 'DELETE FROM `tbl_posts` WHERE post_id = :post_id';
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam('post_id', $json['post_id'], PDO::PARAM_INT);
+    $stmt->execute();
+
+    $result = $stmt->rowCount() > 0 ? 1 : 0;
+    unset($conn);
+    unset($stmt);
+    echo json_encode($result);
+
+  }
+
   function getLikes($json) {
     include 'connection/connection.php';
       
@@ -176,6 +191,9 @@ switch ($operation) {
     break;
   case 'fetchLikes':
     $post->getLikes($json);
+    break;
+  case 'delete':
+    $post->deletePost($json);
     break;
   default:
     echo 'Invalid Operation';

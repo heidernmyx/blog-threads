@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import { ThemeProvider } from "next-themes";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import ProfileDropDown from "@/components/profile-drop-down";
+import { Toaster } from "@/components/ui/sonner"
 
 // Ensure you have a utility function `cn` like this or correctly imported.
 function cn(...classes: string[]) {
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             disableTransitionOnChange
           >
           {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

@@ -28,7 +28,7 @@ import {
   MenubarTrigger,
 } from "@/components/ui/menubar"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-
+import { toast } from "sonner"
 
 
 interface VoteProps {
@@ -36,7 +36,8 @@ interface VoteProps {
   user_id: string | undefined;
 }
 
-interface PostVoteList {  
+interface PostVoteList {
+  vote_id: number
   username: string;
   vote_type: string;
 }
@@ -45,22 +46,22 @@ const Vote: React.FC<VoteProps> = ({ post_id, user_id }) => {
   const [currentVote, setCurrentVote] = useState<"upvote" | "downvote" | null>(null);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertType, setAlertType] = useState<"upvote" | "downvote" | null>(null);
-  const [ votesList, setVotesList ] = useState<PostVoteList[]>([]);
+  const [votesList, setVotesList] = useState<PostVoteList[]>([]);
 
 
   const likeListRef = React.useRef<HTMLButtonElement>(null);
   useEffect(() => {
-    if (!user_id) return;
+    if (!post_id && !user_id) return;
 
     const fetchUserVote = async () => {
       try {
         const response = await axios.get(`${process.env.NEXT_PUBLIC_URL}php/vote.php`, {
           params: {
             operation: 'getVote',
-            post_id,
-            user_id
+            json: JSON.stringify({ post_id: post_id, user_id: user_id })
           }
         });
+
 
         // Assuming the API returns the vote type (e.g., "upvote", "downvote", or null)
         setCurrentVote(response.data.vote_type);
@@ -73,12 +74,12 @@ const Vote: React.FC<VoteProps> = ({ post_id, user_id }) => {
   }, [post_id, user_id]);
 
   // const fetchUpvote = async (post_id: number) => {
-      
+
   // }
 
   useEffect(() => {
     fetchVotesList(post_id);
-  }, [])
+  }, [currentVote])
 
   const vote = async (voteType: "upvote" | "downvote") => {
     if (!user_id) return;
@@ -93,25 +94,40 @@ const Vote: React.FC<VoteProps> = ({ post_id, user_id }) => {
     formData.append('operation', operation);
     formData.append('json', JSON.stringify(likeDetails));
 
-    try {
-      const response = await axios({
-        url: url,
-        method: 'POST',
-        data: formData
-      });
-      setCurrentVote(voteType);
-      console.log(response.data);
-      setAlertMessage(response.data.message);
-      setAlertType(voteType);
-    } catch (error) {
-      console.error(`Error ${voteType}ing:`, error);
+    const response = await axios({
+      url: url,
+      method: 'POST',
+      data: formData
+    });
+    setCurrentVote(voteType);
+    console.log(response.data);
+    setAlertMessage(response.data.message);
+    setAlertType(voteType);
+    toast('Vote Alert!', {
+      description: response.data.message,
+    })
+
+    if (response.data.message == 'Upvote removed') {
+      setCurrentVote(null);
     }
+    else if (response.data.message == 'Downvote removed') {
+      setCurrentVote(null);
+    }
+
   };
 
-  const upvote = () => vote("upvote");
-  const downvote = () => vote("downvote");
+  const upvote = () => {
+    vote("upvote")
 
-  const [ activeMenu, setActiveMenu ] = React.useState<string>('');
+  };
+  const downvote = () => {
+    vote("downvote")
+    // toast('Downvote Alert!', {
+    //   description: alertMessage,
+    // })
+  };
+
+  const [activeMenu, setActiveMenu] = React.useState<string>('');
 
   const handleMenuClick = (menu: string) => {
     setActiveMenu(menu);
@@ -128,29 +144,31 @@ const Vote: React.FC<VoteProps> = ({ post_id, user_id }) => {
       }
     });
     console.log(response.data)
-
     const List: PostVoteList[] = Array.isArray(response.data) ? response.data.map((votes) => ({
+      vote_id: votes.vote_id,
       username: votes.username,
       vote_type: votes.vote_type
     })) : [];
     setVotesList(List);
-
   }
+
+
+
 
 
   return (
     <>
       <div className="w-full flex items-center">
-        <Button 
-          onClick={upvote} 
+        <Button
+          onClick={() => { upvote() }}
           variant={'secondary'}
-          className={`hover:text-primary-foreground text-lg ${currentVote === "upvote" ? "text-amber-400" : ""}`}>
+          className={`hover:text-primary-foreground text-lg ${currentVote == "upvote" ? "text-amber-400" : ""}`}>
           ▲ <span className='text-xs'>Upvote</span>
         </Button>
-        <Button 
-          onClick={downvote} 
+        <Button
+          onClick={() => { downvote() }}
           variant={'secondary'}
-          className={`hover:text-primary-foreground text-lg ${currentVote === "downvote" ? "text-violet-500 " : ""}`}>
+          className={`hover:text-primary-foreground text-lg ${currentVote == "downvote" ? "text-violet-500" : ""}`}>
           ▼ <span className='text-xs'>Downvote</span>
         </Button>
         <PostVotes onClick={() => likeListRef.current?.click()} post_id={post_id} />
@@ -164,7 +182,7 @@ const Vote: React.FC<VoteProps> = ({ post_id, user_id }) => {
           </AlertDescription>
         </Alert>
       )} */}
-      
+
       <AlertDialog>
         <AlertDialogTrigger ref={likeListRef} className='hidden'>Open</AlertDialogTrigger>
         <AlertDialogContent>
@@ -172,7 +190,7 @@ const Vote: React.FC<VoteProps> = ({ post_id, user_id }) => {
             <AlertDialogTitle className='flex h-[5vh] justify-start items-center space-x-4'>
               <span>Votes</span>
               <Menubar>
-              <MenubarMenu>
+                <MenubarMenu>
                   <MenubarTrigger className={getTriggerClass('all')} onClick={() => handleMenuClick('all')}>All</MenubarTrigger>
                 </MenubarMenu>
                 <MenubarMenu>
@@ -183,17 +201,57 @@ const Vote: React.FC<VoteProps> = ({ post_id, user_id }) => {
                 </MenubarMenu>
               </Menubar>
             </AlertDialogTitle>
-            <AlertDialogDescription className='my-[1vh]'>
-              { activeMenu == 'all' && votesList.map((vote) => 
-                <div className='w-full border border-black'>
-                  <div className='flex space-x-4 '>
+            <div className='h-[1h]'></div>
+            <AlertDialogDescription className='border rounded-xl'>
+              {activeMenu == 'all' && votesList.map((vote) =>
+              (
+                <div key={vote.vote_id} className='w-full'>
+                  <div className='flex items-center px-[1vw] space-x-4'>
                     <Avatar>
                       <AvatarImage src={'/assets/gif/cat-nyan-cat.gif'} />
                       <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
+                    <span className={`text-foreground ${vote.vote_type === 'upvote' ? 'text-amber-400' : 'text-violet-500'}`}>
+                      {vote.username}
+                    </span>
                   </div>
                 </div>
+              )
               )}
+              {activeMenu == 'upvote' && votesList
+                .filter((vote) => vote.vote_type == 'upvote')
+                .map((vote) =>
+                (
+                  <div key={vote.vote_id} className='w-full'>
+                    <div className='flex items-center px-[1vw] space-x-4'>
+                      <Avatar>
+                        <AvatarImage src={'/assets/gif/cat-nyan-cat.gif'} />
+                        <AvatarFallback>CN</AvatarFallback>
+                      </Avatar>
+                      <span className={`text-foreground ${vote.vote_type === 'upvote' ? 'text-amber-400' : 'text-violet-500'}`}>
+                        {vote.username}
+                      </span>
+                    </div>
+                  </div>
+                )
+                )}
+              {activeMenu == 'downvote' && votesList
+                .filter((vote) => vote.vote_type == 'downvote')
+                .map((vote) =>
+                (
+                  <div key={vote.vote_id} className='w-full a'>
+                    <div className='flex items-center px-[1vw] space-x-4'>
+                      <Avatar>
+                        <AvatarImage src={'/assets/gif/cat-nyan-cat.gif'} />
+                        <AvatarFallback>CN</AvatarFallback>
+                      </Avatar>
+                      <span className={`text-foreground ${vote.vote_type === 'upvote' ? 'text-amber-400' : 'text-violet-500'}`}>
+                        {vote.username}
+                      </span>
+                    </div>
+                  </div>
+                )
+                )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
