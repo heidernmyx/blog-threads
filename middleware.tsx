@@ -24,6 +24,7 @@ function handlePublicRoutes(pathUrl: string, token: JWT | null, req: NextRequest
   }
 }
 
+
 export async function middleware(req: NextRequest) {
   const pathUrl = req.nextUrl.pathname;
 
@@ -31,6 +32,7 @@ export async function middleware(req: NextRequest) {
   const isPublicRoute = ['/auth/signin', '/auth/signup'].includes(pathUrl);
 
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+
 
   if (isProtectedRoute) {
     return handleProtectedRoutes(pathUrl, token, req);

@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/menubar"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { toast } from "sonner"
-
+import { useToast } from './ui/use-toast';
 
 interface VoteProps {
   post_id: number;
@@ -48,7 +48,7 @@ const Vote: React.FC<VoteProps> = ({ post_id, user_id }) => {
   const [alertType, setAlertType] = useState<"upvote" | "downvote" | null>(null);
   const [votesList, setVotesList] = useState<PostVoteList[]>([]);
 
-
+  
   const likeListRef = React.useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (!post_id && !user_id) return;
@@ -211,7 +211,7 @@ const Vote: React.FC<VoteProps> = ({ post_id, user_id }) => {
                       <AvatarImage src={'/assets/gif/cat-nyan-cat.gif'} />
                       <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
-                    <span className={`text-foreground ${vote.vote_type === 'upvote' ? 'text-amber-400' : 'text-violet-500'}`}>
+                    <span className={`text-foreground ${vote.vote_type == 'upvote' ? 'text-amber-500' : 'text-violet-500'}`}>
                       {vote.username}
                     </span>
                   </div>
@@ -228,7 +228,7 @@ const Vote: React.FC<VoteProps> = ({ post_id, user_id }) => {
                         <AvatarImage src={'/assets/gif/cat-nyan-cat.gif'} />
                         <AvatarFallback>CN</AvatarFallback>
                       </Avatar>
-                      <span className={`text-foreground ${vote.vote_type === 'upvote' ? 'text-amber-400' : 'text-violet-500'}`}>
+                      <span className={`text-foreground ${vote.vote_type == 'upvote' ? 'text-amber-500' : 'text-violet-500'}`}>
                         {vote.username}
                       </span>
                     </div>
@@ -245,7 +245,7 @@ const Vote: React.FC<VoteProps> = ({ post_id, user_id }) => {
                         <AvatarImage src={'/assets/gif/cat-nyan-cat.gif'} />
                         <AvatarFallback>CN</AvatarFallback>
                       </Avatar>
-                      <span className={`text-foreground ${vote.vote_type === 'upvote' ? 'text-amber-400' : 'text-violet-500'}`}>
+                      <span className={`text-foreground ${vote.vote_type == 'upvote' ? 'text-amber-500' : 'text-violet-500'}`}>
                         {vote.username}
                       </span>
                     </div>

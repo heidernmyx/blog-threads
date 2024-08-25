@@ -23,34 +23,81 @@ const Post = () => {
 
   const [ session, setSession ] = React.useState<User>();
   const pathname = usePathname();
-  console.log(pathname);
-  useEffect(() => {
-    const fetchSession = async () => {
-      const sessionData = await returnSession();
-      console.log(sessionData)
-      setSession(sessionData);
-    }
-    fetchSession();
-  }, [])
-  console.log(session);
   const [posts, setPosts] = useState<PostProps[]>([]);
   const [activeCommentPostId, setActiveCommentPostId] = useState<number | null>(null);
   const [ comment, setComment ] = useState<string>('');
+  const [ sessionFetched, setSessionFetched ] = useState(false);
+
+
   useEffect(() => {
-    const fetchPosts = async () => {
-      const response = await axios.get<PostProps[]>(`${process.env.NEXT_PUBLIC_URL}php/posts.php`, {
-        params: { operation: 'fetch' }
-      });
-      // console.log(response.data)
-      if (response.status === 200 && response.data) {
-        const List: PostProps[] = Array.isArray(response.data)
-          ? response.data.map((post: PostProps) => ({
-              post_id: post.post_id,
-              post_title: post.post_title,
-              post_username: post.post_username,
-              post_description: post.post_description,
-              time_posted: post.time_posted,
-              post_comments: Array.isArray(post.post_comments)
+    fetchSession();
+    console.log(pathname)
+    if (pathname == '/dashboard/liked-posts' && sessionFetched) {
+      console.log(true);
+      console.log(session!.id)
+      fetchLikedPosts(session!.id);
+    }
+  }, [sessionFetched])
+
+  const fetchSession = async () => {
+    const sessionData = await returnSession();
+    console.log(sessionData)
+    setSession(sessionData);
+    setSessionFetched(true);
+  }
+  console.log(session);
+  console.log(session?.id)
+  
+
+  const fetchPosts = async () => {
+    const response = await axios.get<PostProps[]>(`${process.env.NEXT_PUBLIC_URL}php/posts.php`, {
+      params: { operation: 'fetch' }
+    });
+    // console.log(response.data)
+    if (response.status === 200 && response.data) {
+      const List: PostProps[] = Array.isArray(response.data)
+        ? response.data.map((post: PostProps) => ({
+            post_id: post.post_id,
+            post_title: post.post_title,
+            post_username: post.post_username,
+            post_description: post.post_description,
+            time_posted: post.time_posted,
+            post_comments: Array.isArray(post.post_comments)
+            ? post.post_comments.map((comment: CommentProps) => ({
+                comment_id: comment.comment_id,
+                comment_text: comment.comment_text,
+                comment_username: comment.comment_username,
+                comment_time: comment.comment_time
+              }))
+            : [],
+          }))
+        : [];
+      console.log(posts)
+      setPosts(List);
+    }
+  };
+
+  const fetchLikedPosts = async (session_id: number) => {
+    if (!session?.id) {
+      await fetchSession();
+    }
+  
+    if (session?.id) {
+      try {
+        const response = await axios.get<PostProps[]>(`${process.env.NEXT_PUBLIC_URL}php/liked_post.php`, {
+          params: { session_id: session_id }
+        });
+        console.log(response.data);
+  
+        if (response.data && response.data.length > 0) {
+          console.log(true)
+          const List: PostProps[] = response.data.map((post: PostProps) => ({
+            post_id: post.post_id,
+            post_title: post.post_title,
+            post_username: post.post_username,
+            post_description: post.post_description,
+            time_posted: post.time_posted,
+            post_comments: Array.isArray(post.post_comments)
               ? post.post_comments.map((comment: CommentProps) => ({
                   comment_id: comment.comment_id,
                   comment_text: comment.comment_text,
@@ -58,21 +105,25 @@ const Post = () => {
                   comment_time: comment.comment_time
                 }))
               : [],
-            }))
-          : [];
-        console.log(posts)
-        setPosts(List);
+          }));
+          console.log(List);
+          setPosts(List);
+        }
+      } catch (error) {
+        console.error('Error fetching liked posts:', error);
       }
-    };
-
-    fetchPosts();
-  }, []);
-
-  React.useEffect(() => {
-    if (pathname == '/dashboard/liked-posts') {
-      
     }
-  }, [pathname])
+  };
+  
+  React.useEffect(() => {
+    if (pathname === '/dashboard') {
+      fetchPosts();
+    } 
+    // else if (pathname === '/dashboard/liked-posts' && sessionFetched) {
+    //   console.log(sessionFetched)
+    //   fetchLikedPosts();
+    // }
+  }, [pathname, sessionFetched]);
 
   
 

@@ -6,9 +6,10 @@ import Post from '@/components/post';
 
 
 const LikedPost = () => {
+
   return (
     <div className="min-h-screen flex flex-col items-center">
-        
+        <span className='text-center text-lg font-semibold'>Voted post</span>
         <div className="flex flex-col justify-center">
           <div className="post-container flex flex-col items-center p-4 border border-solid border-gray-300 rounded-xl bg-opacity-50">
             {/* <div className="w-full flex justify-star?t px-[1vw] py-[1vw]"> */}

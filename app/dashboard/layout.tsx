@@ -40,7 +40,7 @@ export default function RootLayout({
               <Separator orientation="vertical"/>
               <Button variant={"link"}>
                 <Link href={'/dashboard/liked-posts'}>
-                  <span className="text-lg font-semibold">Likes</span>
+                  <span className="text-lg font-semibold">Votes</span>
                 </Link>
               </Button>
             </div>

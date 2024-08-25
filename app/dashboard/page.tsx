@@ -70,7 +70,6 @@ const Dashboard = () => {
   return (
     <>
       <div className="min-h-screen flex flex-col items-center">
-        
         <div className="flex flex-col justify-center">
           <div className="post-container flex flex-col items-center p-4 border border-solid border-gray-300 rounded-xl bg-opacity-50">
             <div className="w-full flex justify-start px-[1vw] py-[1vw]">
