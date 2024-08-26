@@ -211,7 +211,7 @@ const Vote: React.FC<VoteProps> = ({ post_id, user_id }) => {
                       <AvatarImage src={'/assets/gif/cat-nyan-cat.gif'} />
                       <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
-                    <span className={`text-foreground ${vote.vote_type == 'upvote' ? 'text-amber-500' : 'text-violet-500'}`}>
+                    <span className={`text-foreground ${vote.vote_type == 'upvote' ? 'text-yellow-500' : 'text-violet-500'}`}>
                       {vote.username}
                     </span>
                   </div>
@@ -228,7 +228,7 @@ const Vote: React.FC<VoteProps> = ({ post_id, user_id }) => {
                         <AvatarImage src={'/assets/gif/cat-nyan-cat.gif'} />
                         <AvatarFallback>CN</AvatarFallback>
                       </Avatar>
-                      <span className={`text-foreground ${vote.vote_type == 'upvote' ? 'text-amber-500' : 'text-violet-500'}`}>
+                      <span className={`text-foreground ${vote.vote_type == 'upvote' ? 'text-yellow-500' : 'text-violet-500'}`}>
                         {vote.username}
                       </span>
                     </div>
@@ -245,7 +245,7 @@ const Vote: React.FC<VoteProps> = ({ post_id, user_id }) => {
                         <AvatarImage src={'/assets/gif/cat-nyan-cat.gif'} />
                         <AvatarFallback>CN</AvatarFallback>
                       </Avatar>
-                      <span className={`text-foreground ${vote.vote_type == 'upvote' ? 'text-amber-500' : 'text-violet-500'}`}>
+                      <span className={`text-foreground ${vote.vote_type == 'upvote' ? 'text-yellow-400' : 'text-violet-500'}`}>
                         {vote.username}
                       </span>
                     </div>

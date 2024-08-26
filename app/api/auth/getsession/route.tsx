@@ -1,10 +1,10 @@
 "use server"
 import { getSession } from "next-auth/react";
-import { GET } from "../[...nextauth]/route";
+import { authOptions } from "../[...nextauth]/route";
 import { getServerSession } from "next-auth";
 
-export async function returnSession () {
-  const sessionData = await getServerSession(GET);
+export const returnSession = async () => {
+  const sessionData = await getServerSession(authOptions);
   console.log(sessionData);
   return sessionData?.user;
 }

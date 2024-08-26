@@ -24,13 +24,13 @@ import type { User } from "next-auth";
 import { returnSession } from "../api/auth/getsession/route";
 
 const Dashboard = () => {
-  const [session, setSession] = useState<User>();
+  const [session, setSession] = useState<User | null>();
 
   useEffect(() => {
     async function _fetch() {
       const sessionData = await returnSession();
       console.log(sessionData)
-      setSession(sessionData);
+      setSession(sessionData.user);
     }
     _fetch();
   }, []);

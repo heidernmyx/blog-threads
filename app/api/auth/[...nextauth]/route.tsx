@@ -1,4 +1,4 @@
-import NextAuth, { AuthOptions } from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
 import { comparePassword } from '@/actions/hashpw';
@@ -8,7 +8,7 @@ import { NextResponse } from "next/server";
 // Your own logic for dealing with plaintext password strings; be careful!
 // import { saltAndHashPassword } from "@/utils/password";
 
-const authOptions: AuthOptions = ({
+export const authOptions: NextAuthOptions = ({
   session: {
     strategy: 'jwt',
   },
@@ -62,18 +62,24 @@ const authOptions: AuthOptions = ({
         token.id = Number(user.id);
         token.username = user.username;
         token.email = user.email;
+        console.log(token.id)
+      return token;
       } else {
         // console.log(false);
       }
-
       return token;
     },
     async session({ session, token }) {
-      // Add token information to the session
-      session.user.id = token!.id;
-      session.user.username = token!.username;
-      session.user.email = token!.email ?? "";
-      return session;
+      // This block runs when session data is being prepared
+      if (token.id) {
+        session.user.id = token.id;  // Include user ID in the session object
+      }
+      if (token.username) {
+        session.user.username = token.username;  // Include username in the session object
+      }
+      session.user.email = token.email ?? ""; 
+      console.log(session);
+      return session;  // Return the modified session object
     },
   },
   pages: {
@@ -85,7 +91,9 @@ const authOptions: AuthOptions = ({
   }
 });
 
-export { authOptions as GET, authOptions as POST };
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };
 
 
 
