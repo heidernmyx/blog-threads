@@ -19,7 +19,7 @@ export interface PostProps {
 export interface PostDetails {
   post_title: string;
   post_description: string;
-  postUser_id: string;
+  postUser_id: number;
 }
 
 export interface CommentProps {
@@ -31,7 +31,7 @@ export interface CommentProps {
 
 export interface CommentDetails {
   post_id: number,
-  userComment_id: string,
+  userComment_id: number,
   comment_text: string
 }
 
@@ -53,6 +53,6 @@ export interface SessionProps {
 
 
 export type LikeDetails = {
-  post_id: string;
-  user_id: string;
+  post_id: number;
+  user_id: number;
 }

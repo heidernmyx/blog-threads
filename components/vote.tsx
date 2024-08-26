@@ -33,7 +33,7 @@ import { useToast } from './ui/use-toast';
 
 interface VoteProps {
   post_id: number;
-  user_id: string | undefined;
+  user_id: number | undefined;
 }
 
 interface PostVoteList {
@@ -87,7 +87,7 @@ const Vote: React.FC<VoteProps> = ({ post_id, user_id }) => {
     const operation = voteType === "upvote" ? "upvote" : "downvote";
     const url = `${process.env.NEXT_PUBLIC_URL}php/vote.php`;
     const likeDetails: LikeDetails = {
-      post_id: post_id.toString(),
+      post_id: post_id,
       user_id: user_id
     };
     const formData = new FormData();

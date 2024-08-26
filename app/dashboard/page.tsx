@@ -20,15 +20,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axios from "axios";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getSession } from "next-auth/react";
-import type { Session } from "next-auth";
+import type { User } from "next-auth";
+import { returnSession } from "../api/auth/getsession/route";
 
 const Dashboard = () => {
-  const [session, setSession] = useState<Session | null>(null);
+  const [session, setSession] = useState<User>();
 
   useEffect(() => {
     async function _fetch() {
-      const sessionData = await getSession();
+      const sessionData = await returnSession();
+      console.log(sessionData)
       setSession(sessionData);
     }
     _fetch();
@@ -47,7 +48,7 @@ const Dashboard = () => {
 
     const postDetails: PostDetails = {
       post_title: title,
-      postUser_id: session!.user.id,
+      postUser_id: session!.id,
       post_description: description,
     };
     formData.append("operation", "upload");

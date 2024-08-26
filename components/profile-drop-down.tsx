@@ -15,6 +15,7 @@ import { returnSession } from '../app/api/auth/getsession/route';
 import type { User } from 'next-auth';
 import { Logout } from '@/actions/logout';
 import { signOut } from "next-auth/react";
+import axios from 'axios';
 
 const ProfileDropDown = () => {
 
@@ -22,6 +23,8 @@ const ProfileDropDown = () => {
 
   React.useEffect(() => {
     const fetchSession = async () => {
+      console.log(true)
+
       const sessionData = await returnSession();
       const user = sessionData;
       setSession(sessionData)
