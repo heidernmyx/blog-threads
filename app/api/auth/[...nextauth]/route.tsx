@@ -2,13 +2,9 @@ import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
 import { comparePassword } from '@/actions/hashpw';
-import { string } from "zod";
 import { NextResponse } from "next/server";
 
-// Your own logic for dealing with plaintext password strings; be careful!
-// import { saltAndHashPassword } from "@/utils/password";
-
-export const authOptions: NextAuthOptions = ({
+export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
   },
@@ -23,7 +19,6 @@ export const authOptions: NextAuthOptions = ({
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials, req) {
-
         const formData = new FormData();
 
         const username = credentials?.username;
@@ -85,11 +80,9 @@ export const authOptions: NextAuthOptions = ({
   pages: {
     signIn: '/auth/signin',
     signOut: '/auth/signout',
-    // error: '/auth/error', // Error code passed in query string as ?error=
-    verifyRequest: '/auth/verify-request', // (used for check email message)
-    // newUser: null // If set, new users will be directed here on first sign in
+    verifyRequest: '/auth/verify-request'
   }
-});
+};
 
 const handler = NextAuth(authOptions);
 
