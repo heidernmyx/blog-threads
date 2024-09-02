@@ -12,14 +12,14 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { returnSession } from '../app/api/auth/getsession/route';
-import type { User } from 'next-auth';
+import type { Session, User } from 'next-auth';
 import { Logout } from '@/actions/logout';
 import { signOut } from "next-auth/react";
 import axios from 'axios';
 
 const ProfileDropDown = () => {
 
-  const [ session, setSession ] = React.useState<User>();
+  const [ session, setSession ] = React.useState<Session | null>();
 
   React.useEffect(() => {
     const fetchSession = async () => {
@@ -45,7 +45,7 @@ const ProfileDropDown = () => {
                 <AvatarImage src="/assets/gif/pikachu-pixel.gif" />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
-              <span>{session?.username}</span>
+              <span>{session?.user.name}</span>
               {/* <span className="sr-only">Toggle user menu</span> */}
             </div>
           </Button>

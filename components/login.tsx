@@ -34,49 +34,17 @@ const Login = () => {
 
       console.log(response)
 
-
-    //   {
-    //     error: null,
-    //     status: 200,
-    //     ok: true,
-    //     url: 'http://localhost:3000/auth/signin'
-    //   }
-    // 17:26:48.844 | +54 sec | next.js browser	  
-    //   {
-    //     error: 
-    //       'Cannot destructure property \'account_id\' of \'response.data\' as it is null.',
-    //     status: 401,
-    //     ok: false,
-    //     url: null
-    //   }
-
     if(response?.ok) {
       window.location.reload();
     }
     else if(!response?.ok) {
       alert("Wrong Credentials")
     }
-
-      // if (response?.error) {
-      //   alert('Wrong Credentials')
-      // }
-      // if (response?.error) {
-      //   alert('Wrong Credentials')
-      // }
-
-
-      // if () {
-
-      // }
     } catch (error) {
       console.error(error)
     }
-  
-    
   }
   
-  
-
   return (
     <>
       <Card className="w-full max-w-sm ">

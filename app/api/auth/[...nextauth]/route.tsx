@@ -60,7 +60,7 @@ export const authOptions: NextAuthOptions = ({
       console.log(user);
       if (user) {
         token.id = Number(user.id);
-        token.username = user.username;
+        token.name = user.name;
         token.email = user.email;
         console.log(token.id)
       return token;
@@ -72,10 +72,10 @@ export const authOptions: NextAuthOptions = ({
     async session({ session, token }) {
       // This block runs when session data is being prepared
       if (token.id) {
-        session.user.id = token.id;  // Include user ID in the session object
+        session.user.id = token.id.toString();  // Include user ID in the session object
       }
       if (token.username) {
-        session.user.username = token.username;  // Include username in the session object
+        session.user.name = token.username;  // Include username in the session object
       }
       session.user.email = token.email ?? ""; 
       console.log(session);
@@ -93,16 +93,4 @@ export const authOptions: NextAuthOptions = ({
 
 const handler = NextAuth(authOptions);
 
-export { handler };
-
-
-
-
-
-
-
-
-
-
-
-
+export { handler as GET, handler as POST };
